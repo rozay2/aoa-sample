@@ -1,0 +1,32 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Azure/BatchAI/master/schemas/2018-05-01/job.json",
+    "properties": {
+        "nodeCount": 2,
+        "horovodSettings": {
+            "pythonScriptFilePath": "$AZ_BATCHAI_JOB_MOUNT_ROOT/batchshare/benchmarks/scripts/tf_cnn_benchmarks/tf_cnn_benchmarks_gpumon.py",
+            "commandLineArgs": "--model resnet50 --batch_size 64 --variable_update horovod",
+            "processCount": 4
+        },
+        "stdOutErrPathPrefix": "$AZ_BATCHAI_JOB_MOUNT_ROOT/logs",
+        "mountVolumes": {
+            "azureFileShares": [
+                {
+                    "azureFileUrl": "https://ikwu2aidl.file.core.windows.net/batchshare/logs",
+                    "relativeMountPath": "logs"
+                },
+                {
+                    "azureFileUrl": "https://ikwu2aidl.file.core.windows.net/batchshare",
+                    "relativeMountPath": "batchshare"
+                }
+            ]
+        },
+        "jobPreparation": {
+          "commandLine": "apt update; apt install mpi-default-dev mpi-default-bin git pandoc -y; pip install torch; pip install horovod; git clone https://github.com/msalvaris/gpu_monitor.git; pip install -r gpu_monitor/requirements.txt; pip install -e gpu_monitor"
+        },
+        "containerSettings": {
+            "imageSourceRegistry": {
+                "image": "tensorflow/tensorflow:latest-gpu-py3"
+            }
+        }
+    }
+}
